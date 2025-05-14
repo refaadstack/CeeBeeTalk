@@ -1,45 +1,74 @@
+import { useFonts } from 'expo-font';
 import { Tabs } from 'expo-router';
-import React from 'react';
-import { Platform } from 'react-native';
+import * as SplashScreen from 'expo-splash-screen';
+import { StatusBar } from 'expo-status-bar';
+import { useEffect } from 'react';
+import { View } from 'react-native';
 
-import { HapticTab } from '@/components/HapticTab';
-import { IconSymbol } from '@/components/ui/IconSymbol';
-import TabBarBackground from '@/components/ui/TabBarBackground';
-import { Colors } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
+// Tahan splash screen sampai aplikasi siap
+SplashScreen.preventAutoHideAsync();
 
-export default function TabLayout() {
-  const colorScheme = useColorScheme();
+export default function RootLayout() {
+  const [fontsLoaded] = useFonts({
+    // Anda bisa menambahkan font custom di sini jika diperlukan
+  });
+
+  useEffect(() => {
+    if (fontsLoaded) {
+      // Sembunyikan splash screen ketika font sudah di-load
+      SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded]);
+
+  if (!fontsLoaded) {
+    return null;
+  }
 
   return (
-    <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: false,
-        tabBarButton: HapticTab,
-        tabBarBackground: TabBarBackground,
-        tabBarStyle: Platform.select({
-          ios: {
-            // Use a transparent background on iOS to show the blur effect
-            position: 'absolute',
+    <>
+      <StatusBar style="auto" />
+      <Tabs
+        screenOptions={{
+          headerShown: false,
+          tabBarActiveTintColor: '#F49BAB',
+          tabBarInactiveTintColor: '#999',
+          tabBarStyle: {
+            height: 60,
+            paddingBottom: 8,
           },
-          default: {},
-        }),
-      }}>
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          tabBarLabelStyle: {
+            fontSize: 12,
+          },
         }}
-      />
-      <Tabs.Screen
-        name="explore"
-        options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
-        }}
-      />
-    </Tabs>
+      >
+        <Tabs.Screen
+          name="index"
+          options={{
+            title: 'Beranda',
+            tabBarIcon: ({ color }) => (
+              <View style={{ width: 24, height: 24, backgroundColor: color, borderRadius: 12 }} />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="communication"
+          options={{
+            title: 'Komunikasi',
+            tabBarIcon: ({ color }) => (
+              <View style={{ width: 24, height: 24, backgroundColor: color, borderRadius: 4 }} />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="settings"
+          options={{
+            title: 'Pengaturan',
+            tabBarIcon: ({ color }) => (
+              <View style={{ width: 24, height: 24, backgroundColor: color, borderRadius: 8, transform: [{ rotate: '45deg' }] }} />
+            ),
+          }}
+        />
+      </Tabs>
+    </>
   );
 }
